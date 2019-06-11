@@ -25,6 +25,8 @@ public class ExploreSpringBootApplication {
     @Bean
     CommandLineRunner saveDogs(DogRepo repo) {
         return args -> {
+            repo.deleteAll();
+
             Stream.of("Golden Retriever", "Cocker Spaniel", "Dachshund")
                     .map(Dog::new)
                     .forEach(repo::save);
@@ -50,7 +52,7 @@ class DogCatcher {
         Dog existingDog = repo.findByType(dog.getType());
         if (null == existingDog) {
             existingDog = repo.save(new Dog(dog.getType()));
-        } 
+        }
 
         System.out.println(existingDog);
     }
