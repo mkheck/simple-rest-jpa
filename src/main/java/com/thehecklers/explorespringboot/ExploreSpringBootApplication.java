@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +38,22 @@ public class ExploreSpringBootApplication {
         SpringApplication.run(ExploreSpringBootApplication.class, args);
     }
 
+}
+
+@EnableBinding(Sink.class)
+@AllArgsConstructor
+class DogCatcher {
+    private final DogRepo repo;
+
+    @StreamListener(Sink.INPUT)
+    void saveDog(Dog dog) {
+        Dog existingDog = repo.findByType(dog.getType());
+        if (null == existingDog) {
+            existingDog = repo.save(new Dog(dog.getType()));
+        } 
+
+        System.out.println(existingDog);
+    }
 }
 
 @RestController
